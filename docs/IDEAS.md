@@ -23,10 +23,14 @@ auszuprobieren.
 Bewusste Vereinfachung gegenüber echtem MTG (kein Stack, keine
 Priorität/Interrupts), um die Regel-Engine überschaubar zu halten.
 
-- **Draft-Basis:** Spieler und KI öffnen jeweils ein Pack aus derselben Serie
-  (z. B. Bloomburrow)
-- **Deckbau:** aus den eigenen Pack-Karten werden 4 Mini-Decks à 3 Karten
-  gebaut — Kernspielreiz: beste Kombinationen aus dem eigenen Pack basteln
+- **Draft-Basis:** Spieler und KI öffnen jeweils ein Play-Booster-Pack aus
+  derselben Serie (z. B. Bloomburrow). Ein Play-Booster enthält 14 Karten:
+  12 Spielkarten + 1 Token + 1 Standardland. Token & Land werden automatisch
+  beiseitegelegt (keine Effekte), außer der Token wird für eine
+  Mini-Deck-Kombo gebraucht
+- **Deckbau:** aus den 12 Spielkarten des eigenen Packs werden 4 Mini-Decks
+  à 3 Karten gebaut — Kernspielreiz: beste Kombinationen aus dem eigenen
+  Pack basteln
 - **Ablauf:** 4 Runden nacheinander, jeweils Mini-Deck gegen Mini-Deck
 - **Rundenwahl:** Spieler wählt selbst, welches seiner 4 Mini-Decks er in
   welcher Runde einsetzt (taktisches Element)
