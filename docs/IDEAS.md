@@ -60,6 +60,21 @@ Zentraler Reiz des Pai-Gow-Modus: das eigene Pack steht beim Match
 - Risiko ist bewusst gewollt (kein risikofreier Modus) — App ist primär für
   Eigengebrauch, keine Monetarisierung geplant
 
+## Sammlung
+
+Neben dem Pai-Gow-Modus kann man Packs auch einfach so öffnen (ohne
+Wett-Risiko) — ähnlich Pokémon TCG Pocket. Diese Karten wandern direkt und
+dauerhaft in die Sammlung.
+
+- Jedes Set sammelt für sich (eigene Sammlung pro Serie, kein gemeinsamer
+  Pool über mehrere Sets)
+- Alle 14 gezogenen Karten eines Packs wandern in die Sammlung, inklusive
+  Token und Standardland (nicht nur die 12 Spielkarten)
+- Persistiert lokal via localStorage (siehe Tech-Entscheidungen — kein
+  Backend)
+- Im Pai-Gow-Modus bleibt es beim Wett-Prinzip: dort landen die Karten erst
+  nach Matchende in der Sammlung, abhängig vom Ergebnis (siehe oben)
+
 ## Offene Punkte (noch nicht final entschieden)
 
 - Welches Kartenset/welche Mechaniken unterstützt werden (Vanilla-Creatures
