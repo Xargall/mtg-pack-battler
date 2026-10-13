@@ -79,5 +79,19 @@ Zentraler Reiz des Pai-Gow-Modus: das eigene Pack steht beim Match
   startet nächste Woche, danach bewusste Entscheidung ob eigenes Backend
   oder Supabase/Firebase. Backend-Thema also erstmal komplett außen vor.
 - Kartendaten: Scryfall API (gleiche Quelle wie im separaten
-  mtg-collection-app-Projekt)
+  mtg-collection-app-Projekt). Liefert auch Karten-Bilder mit (`image_uris`)
+  — eignet sich daher sowohl fürs Pack-Öffnen-Reveal als auch für die
+  Sammlungsansicht
 - ESLint ist Teil des Setups (Standard-Vite-Template-Config reicht)
+
+## Spätere Idee: Scryfall-Rohdaten cachen
+
+Noch nicht umgesetzt — erst relevant, wenn das Pack-System steht.
+
+- Scryfall-Rohdaten (Set-Kartenlisten) per GitHub Actions regelmäßig
+  abrufen und als statisches JSON im Repo zwischenspeichern, statt bei
+  jedem App-Start live gegen die Scryfall-API zu fragen
+- Ziel: unnötigen Traffic zu Stoßzeiten vermeiden, schnellere Ladezeit
+  für den Nutzer
+- Kein eigenes Backend nötig dafür — reiner Build-/CI-Schritt, der
+  statische Daten erzeugt, passt also zur aktuellen No-Backend-Entscheidung
