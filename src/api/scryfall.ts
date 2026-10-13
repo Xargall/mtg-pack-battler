@@ -60,14 +60,10 @@ function wait(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
-/**
- * Lädt alle regulären Spielkarten eines Sets (keine Tokens/Basics-Varianten
- * wie Art-Series), inklusive Pagination über mehrere Seiten.
- */
-export async function fetchCardsBySet(setCode: string): Promise<Card[]> {
+async function searchCards(query: string): Promise<Card[]> {
   const cards: Card[] = []
   let url: string | undefined =
-    `${SCRYFALL_SEARCH_URL}?q=${encodeURIComponent(`set:${setCode}`)}&order=set&unique=prints`
+    `${SCRYFALL_SEARCH_URL}?q=${encodeURIComponent(query)}&order=set&unique=prints`
 
   while (url) {
     const response = await fetch(url)
@@ -85,4 +81,23 @@ export async function fetchCardsBySet(setCode: string): Promise<Card[]> {
   }
 
   return cards
+}
+
+/** Lädt alle regulären Spielkarten eines Sets, inklusive Basic Lands. */
+export function fetchCardsBySet(setCode: string): Promise<Card[]> {
+  return searchCards(`set:${setCode}`)
+}
+
+/**
+ * Lädt die Tokens eines Sets über dessen eigenen Token-Set-Code (z. B. "tblb").
+ * `layout:token` schließt Emblems & Co. aus, die Scryfall im selben
+ * Token-Set mitführt, aber nie als physische Karte gedruckt werden.
+ */
+export function fetchTokensBySet(tokenSetCode: string): Promise<Card[]> {
+  return searchCards(`set:${tokenSetCode} layout:token`)
+}
+
+/** Lädt nur die Standardländer (Forest/Island/Mountain/Plains/Swamp) eines Sets. */
+export function fetchBasicLands(setCode: string): Promise<Card[]> {
+  return searchCards(`set:${setCode} type:basic`)
 }
