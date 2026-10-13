@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react'
 import { fetchBasicLands, fetchCardsBySet, fetchTokensBySet } from './api/scryfall'
 import { openPack, type OpenedPack } from './game/pack'
+import { addPackToCollection, countDistinctCards, countOwnedCards, loadCollection, saveCollection } from './storage/collection'
 import type { Card } from './types/card'
+import type { Collection } from './types/collection'
 import './App.css'
 
 const SET_CODE = 'blb' // Bloomburrow
 const TOKEN_SET_CODE = 'tblb' // Bloomburrow-Tokens
-const PACK_COUNT = 4
+const PREVIEW_PACK_COUNT = 4
 
 interface Pools {
   cards: Card[]
@@ -18,7 +20,9 @@ function App() {
   const [pools, setPools] = useState<Pools | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [packs, setPacks] = useState<OpenedPack[]>([])
+  const [previewPacks, setPreviewPacks] = useState<OpenedPack[]>([])
+  const [lastOpenedPack, setLastOpenedPack] = useState<OpenedPack | null>(null)
+  const [collection, setCollection] = useState<Collection>(loadCollection)
 
   useEffect(() => {
     Promise.all([
@@ -28,48 +32,92 @@ function App() {
     ])
       .then(([cards, tokens, lands]) => {
         setPools({ cards, tokens, lands })
-        setPacks(
-          Array.from({ length: PACK_COUNT }, () => openPack(cards, tokens, lands)),
+        setPreviewPacks(
+          Array.from({ length: PREVIEW_PACK_COUNT }, () => openPack(cards, tokens, lands)),
         )
       })
       .catch((err: Error) => setError(err.message))
       .finally(() => setIsLoading(false))
   }, [])
 
-  function reshuffle() {
+  // Sammlung bei jeder Änderung persistieren.
+  useEffect(() => {
+    saveCollection(collection)
+  }, [collection])
+
+  function reshufflePreview() {
     if (!pools) return
-    setPacks(
-      Array.from({ length: PACK_COUNT }, () => openPack(pools.cards, pools.tokens, pools.lands)),
+    setPreviewPacks(
+      Array.from({ length: PREVIEW_PACK_COUNT }, () =>
+        openPack(pools.cards, pools.tokens, pools.lands),
+      ),
     )
+  }
+
+  function openAndCollectPack() {
+    if (!pools) return
+    const pack = openPack(pools.cards, pools.tokens, pools.lands)
+    setLastOpenedPack(pack)
+    setCollection((c) => addPackToCollection(c, SET_CODE, pack))
   }
 
   if (isLoading) return <p>Lade Karten…</p>
   if (error) return <p>Fehler: {error}</p>
+  if (!pools) return null
+
+  const totalPrints = pools.cards.length + pools.tokens.length
 
   return (
     <>
-      <button type="button" onClick={reshuffle}>
-        Neu mischen
-      </button>
+      <section>
+        <h2>Sammlung — Bloomburrow</h2>
+        <p>
+          {countDistinctCards(collection, SET_CODE)} / {totalPrints} verschiedene Karten,{' '}
+          {countOwnedCards(collection, SET_CODE)} Karten insgesamt
+        </p>
+        <button type="button" onClick={openAndCollectPack}>
+          Pack öffnen
+        </button>
 
-      {packs.map((pack, i) => (
-        <section key={i}>
-          <h2>Pack {i + 1}</h2>
+        {lastOpenedPack && (
+          <>
+            <h3>Zuletzt geöffnet</h3>
+            <PackView pack={lastOpenedPack} />
+          </>
+        )}
+      </section>
 
-          <h3>Spielkarten</h3>
-          <div className="pack-grid">
-            {pack.cards.map((card) => (
-              <CardFigure key={card.id} card={card} />
-            ))}
+      <hr />
+
+      <section>
+        <h2>Vorschau (Testerei — ändert die Sammlung nicht)</h2>
+        <button type="button" onClick={reshufflePreview}>
+          Neu mischen
+        </button>
+
+        {previewPacks.map((pack, i) => (
+          <div key={i}>
+            <h3>Pack {i + 1}</h3>
+            <PackView pack={pack} />
           </div>
+        ))}
+      </section>
+    </>
+  )
+}
 
-          <h3>Beiseitegelegt</h3>
-          <div className="pack-grid">
-            <CardFigure card={pack.token} />
-            <CardFigure card={pack.land} />
-          </div>
-        </section>
-      ))}
+function PackView({ pack }: { pack: OpenedPack }) {
+  return (
+    <>
+      <div className="pack-grid">
+        {pack.cards.map((card) => (
+          <CardFigure key={card.id} card={card} />
+        ))}
+      </div>
+      <div className="pack-grid">
+        <CardFigure card={pack.token} />
+        <CardFigure card={pack.land} />
+      </div>
     </>
   )
 }
