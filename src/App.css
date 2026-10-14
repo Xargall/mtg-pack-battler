@@ -129,33 +129,17 @@
   text-align: center;
 }
 
-/* Pack-Auswahl-Karussell auf dem Start-Screen */
+/* Set-Auswahl auf dem Start-Screen (Bloomburrow, Duskmourn, …) */
 
 .pack-selector {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 10px;
   overflow-x: auto;
-  overflow-y: hidden;
-  /* So können auch die äußersten Kacheln bis in die Mitte gescrollt werden
-     (halbe Containerbreite minus halbe Tile-Breite als Seitenabstand). */
-  padding: 24px calc(50% - 80px) 28px;
-  scroll-padding-inline: calc(50% - 80px);
-  margin: 0 -16px 4px;
+  padding: 10px 4px 18px;
+  margin: 0 -4px 4px;
   scroll-snap-type: x mandatory;
-  scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch;
-  cursor: grab;
-  user-select: none;
-  scrollbar-width: none;
-}
-
-.pack-selector::-webkit-scrollbar {
-  display: none;
-}
-
-.pack-selector:active {
-  cursor: grabbing;
 }
 
 /* Folienbeutel-Silhouette: leicht getaperter Kopf mit Siegelnaht und
@@ -203,11 +187,15 @@
     0 24px 36px -16px rgba(0, 0, 0, 0.75);
   padding: 0;
   scroll-snap-align: center;
-  /* Startwert, bevor PackSelector den Dreheffekt per rAF übernimmt
-     (useLayoutEffect setzt ihn vorm ersten Paint, das hier ist nur Fallback). */
-  transform: none;
-  opacity: 1;
-  will-change: transform, opacity;
+  transform: scale(0.9);
+  opacity: 0.75;
+  transition:
+    transform 0.15s ease,
+    opacity 0.15s ease;
+}
+
+.pack-tile:active {
+  transform: scale(0.88);
 }
 
 .pack-tile--selected {
@@ -216,6 +204,12 @@
     0 0 0 1px rgba(212, 175, 55, 0.5),
     0 0 28px 4px rgba(212, 175, 55, 0.4),
     0 24px 36px -16px rgba(0, 0, 0, 0.75);
+  transform: scale(1);
+  opacity: 1;
+}
+
+.pack-tile--selected:active {
+  transform: scale(0.98);
 }
 
 .pack-tile__art {
@@ -295,15 +289,36 @@
   text-align: center;
 }
 
-.pack-picker__grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
-  max-width: 320px;
-  margin: 0 auto;
+.pack-picker__carousel {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  /* So können auch die äußersten Kacheln bis in die Mitte gescrollt werden
+     (halbe Containerbreite minus halbe Tile-Breite als Seitenabstand). */
+  padding: 10px calc(50% - 50px) 14px;
+  scroll-padding-inline: calc(50% - 50px);
+  margin: 0 -16px;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  cursor: grab;
+  user-select: none;
+  scrollbar-width: none;
+}
+
+.pack-picker__carousel::-webkit-scrollbar {
+  display: none;
+}
+
+.pack-picker__carousel:active {
+  cursor: grabbing;
 }
 
 .pack-back {
+  flex: 0 0 auto;
+  width: 100px;
   aspect-ratio: 3 / 4;
   border: 2px solid var(--gold-dim);
   background: linear-gradient(160deg, #241a10, #0c0906);
@@ -312,10 +327,12 @@
   justify-content: center;
   padding: 0;
   box-shadow: 0 10px 18px -10px rgba(0, 0, 0, 0.7);
+  scroll-snap-align: center;
+  transform: none;
+  opacity: 1;
 }
 
 .pack-back:active {
-  transform: scale(0.94);
   border-color: var(--gold);
 }
 
