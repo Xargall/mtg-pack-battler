@@ -74,10 +74,10 @@ function App() {
   const previewPacks = useMemo(() => {
     if (!selectedPools) return []
     return Array.from({ length: PREVIEW_PACK_COUNT }, () =>
-      openPack(selectedPools.cards, selectedPools.tokens, selectedPools.lands),
+      openPack(selectedSetCode, selectedPools.cards, selectedPools.tokens, selectedPools.lands),
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps -- reshuffleNonce ist nur ein Trigger
-  }, [selectedPools, reshuffleNonce])
+  }, [selectedSetCode, selectedPools, reshuffleNonce])
 
   const packOptions: PackOption[] = useMemo(
     () =>
@@ -103,7 +103,7 @@ function App() {
     if (!selectedPools) return
     setCandidatePacks(
       Array.from({ length: PACK_CHOICE_COUNT }, () =>
-        openPack(selectedPools.cards, selectedPools.tokens, selectedPools.lands),
+        openPack(selectedSetCode, selectedPools.cards, selectedPools.tokens, selectedPools.lands),
       ),
     )
   }

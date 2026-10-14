@@ -24,13 +24,15 @@ Bewusste Vereinfachung gegenüber echtem MTG (kein Stack, keine
 Priorität/Interrupts), um die Regel-Engine überschaubar zu halten.
 
 - **Draft-Basis:** Spieler und KI öffnen jeweils ein Play-Booster-Pack aus
-  derselben Serie (z. B. Bloomburrow). Ein Play-Booster enthält 14 Karten:
-  12 Spielkarten + 1 Token + 1 Standardland. Token & Land werden automatisch
-  beiseitegelegt (keine Effekte), außer der Token wird für eine
+  derselben Serie (z. B. Bloomburrow). Ein Play-Booster enthält laut echten
+  Booster-Collation-Daten (siehe Tech-Entscheidungen) 14 "echte" Magic-Karten
+  — 13 Spielkarten + 1 Standardland — plus 1 Token/Ad-Karte als Bonus-Insert
+  obendrauf (zählt offiziell nicht zu den 14). Token & Land werden
+  automatisch beiseitegelegt (keine Effekte), außer der Token wird für eine
   Mini-Deck-Kombo gebraucht
-- **Deckbau:** aus den 12 Spielkarten des eigenen Packs werden 4 Mini-Decks
-  à 3 Karten gebaut — Kernspielreiz: beste Kombinationen aus dem eigenen
-  Pack basteln
+- **Deckbau:** aus den 13 Spielkarten des eigenen Packs werden 4 Mini-Decks
+  à 3 Karten gebaut (1 Karte bleibt ungenutzt) — Kernspielreiz: beste
+  Kombinationen aus dem eigenen Pack basteln
 - **Ablauf:** 4 Runden nacheinander, jeweils Mini-Deck gegen Mini-Deck
 - **Rundenwahl:** Spieler wählt selbst, welches seiner 4 Mini-Decks er in
   welcher Runde einsetzt (taktisches Element)
@@ -68,8 +70,8 @@ dauerhaft in die Sammlung.
 
 - Jedes Set sammelt für sich (eigene Sammlung pro Serie, kein gemeinsamer
   Pool über mehrere Sets)
-- Alle 14 gezogenen Karten eines Packs wandern in die Sammlung, inklusive
-  Token und Standardland (nicht nur die 12 Spielkarten)
+- Alle 15 gezogenen Karten eines Packs wandern in die Sammlung, inklusive
+  Token und Standardland (nicht nur die 13 Spielkarten)
 - Persistiert lokal via localStorage (siehe Tech-Entscheidungen — kein
   Backend)
 - Im Pai-Gow-Modus bleibt es beim Wett-Prinzip: dort landen die Karten erst
@@ -103,6 +105,17 @@ dauerhaft in die Sammlung.
   — eignet sich daher sowohl fürs Pack-Öffnen-Reveal als auch für die
   Sammlungsansicht
 - ESLint ist Teil des Setups (Standard-Vite-Template-Config reicht)
+- Pack-Zusammensetzung: echte Booster-Collation-Daten (gewichtete
+  Rarity-Sheets je Set) von github.com/taw/magic-sealed-data, statt
+  eigener Näherung. Per `scripts/fetch-booster-collation.mjs` einmalig pro
+  Set abgerufen und als statisches JSON unter `src/game/data/collation/`
+  abgelegt (kein Live-Fetch im Browser — passt zur
+  Rohdaten-cachen-Idee unten). Repo hat keine LICENSE-Datei; für dieses
+  private Hobbyprojekt als unkritisch eingestuft, nicht weiter geprüft.
+  Sheets, die auf ein anderes Set verweisen (z. B. Special-Guest-Crossover-
+  Karten), werden beim Extrahieren übersprungen, nicht nachgebaut. Sets
+  ohne extrahierte Collation-Datei fallen auf eine grobe
+  Rarity-Näherung zurück (`openPackApprox` in `src/game/pack.ts`)
 
 ## Spätere Idee: Scryfall-Rohdaten cachen
 
