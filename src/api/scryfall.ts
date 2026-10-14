@@ -6,7 +6,7 @@ interface ScryfallCardFace {
   mana_cost?: string
   power?: string
   toughness?: string
-  image_uris?: { normal?: string }
+  image_uris?: { normal?: string; art_crop?: string }
 }
 
 interface ScryfallCard {
@@ -20,7 +20,7 @@ interface ScryfallCard {
   colors?: string[]
   rarity: Card['rarity']
   collector_number: string
-  image_uris?: { normal?: string }
+  image_uris?: { normal?: string; art_crop?: string }
   card_faces?: ScryfallCardFace[]
 }
 
@@ -46,6 +46,7 @@ function toCard(raw: ScryfallCard): Card {
     colors: raw.colors ?? [],
     rarity: raw.rarity,
     imageUrl: raw.image_uris?.normal ?? face?.image_uris?.normal ?? null,
+    artCropUrl: raw.image_uris?.art_crop ?? face?.image_uris?.art_crop ?? null,
     collectorNumber: raw.collector_number,
   }
 }

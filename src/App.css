@@ -1,3 +1,170 @@
+.status {
+  padding: 24px 16px;
+  text-align: center;
+}
+
+/* Top bar: Logo + Fortschritts-Chip, bleibt über beiden Tabs sichtbar */
+
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-elevated);
+}
+
+.top-bar h1 {
+  margin: 0;
+  font-size: 17px;
+  white-space: nowrap;
+}
+
+.top-bar__stat {
+  font-family: var(--heading);
+  font-size: 13px;
+  color: var(--gold);
+  border: 1px solid var(--gold-dim);
+  border-radius: 999px;
+  padding: 4px 12px;
+  background: rgba(212, 175, 55, 0.08);
+  white-space: nowrap;
+}
+
+.app-main {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 20px 16px 24px;
+}
+
+.collection-summary {
+  color: var(--text-dim);
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+/* Bottom-Nav */
+
+.bottom-nav {
+  display: flex;
+  border-top: 1px solid var(--border);
+  background: var(--bg-elevated);
+  padding: 6px 4px calc(6px + env(safe-area-inset-bottom, 0px));
+}
+
+.bottom-nav__item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-size: 11px;
+  padding: 6px 0;
+  border-radius: 8px;
+}
+
+.bottom-nav__item--active {
+  color: var(--gold);
+  background: rgba(212, 175, 55, 0.1);
+}
+
+.bottom-nav__item--disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.bottom-nav__icon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+/* Pack-Tile auf dem Start-Screen */
+
+.pack-tile {
+  position: relative;
+  display: block;
+  width: 100%;
+  max-width: 260px;
+  aspect-ratio: 3 / 4;
+  margin: 4px auto 28px;
+  border: 3px solid var(--gold);
+  border-radius: 16px;
+  overflow: hidden;
+  background: linear-gradient(160deg, #241a10, #0c0906);
+  box-shadow:
+    0 0 0 1px rgba(212, 175, 55, 0.3),
+    0 20px 40px -12px rgba(0, 0, 0, 0.7);
+  padding: 0;
+}
+
+.pack-tile:active {
+  transform: scale(0.98);
+}
+
+.pack-tile__art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.8;
+}
+
+.pack-tile__frame {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 18px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.88) 15%, rgba(0, 0, 0, 0) 60%);
+  text-align: center;
+}
+
+.pack-tile__set {
+  font-family: var(--heading);
+  font-size: 21px;
+  color: var(--text-h);
+  letter-spacing: 1px;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
+}
+
+.pack-tile__cta {
+  margin-top: 10px;
+  font-family: var(--heading);
+  font-size: 12px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #120d09;
+  background: var(--gold);
+  padding: 8px 20px;
+  border-radius: 999px;
+}
+
+.reveal {
+  margin-bottom: 24px;
+}
+
+.dev-preview {
+  margin-top: 32px;
+  border-top: 1px dashed var(--border);
+  padding-top: 12px;
+}
+
+.dev-preview summary {
+  cursor: pointer;
+  color: var(--text-dim);
+  font-size: 13px;
+}
+
+/* Kartenraster (Pack-Reveal & Vorschau) */
+
 .pack-grid {
   display: flex;
   flex-wrap: wrap;
@@ -12,11 +179,7 @@
   width: 150px;
 }
 
-.view-switch {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 16px;
-}
+/* Sammlungs-Raster */
 
 .collection-grid {
   display: flex;
@@ -46,7 +209,7 @@
   top: 4px;
   right: 4px;
   background: rgba(0, 0, 0, 0.75);
-  color: #fff;
+  color: var(--gold);
   padding: 2px 6px;
   border-radius: 4px;
   font-size: 11px;
