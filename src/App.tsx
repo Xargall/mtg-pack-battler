@@ -12,6 +12,10 @@ import type { Collection } from './types/collection'
 import './App.css'
 
 const PREVIEW_PACK_COUNT = 4
+// Wie bei Pokémon TCG Pocket: beim Öffnen werden mehrere Packs vorab
+// gezogen, der Inhalt steht also schon fest — die Auswahl ist nur noch
+// "welches verdeckte Pack tippe ich an", nicht "was bekomme ich".
+const PACK_CHOICE_COUNT = 12
 
 interface Pools {
   cards: Card[]
@@ -37,6 +41,7 @@ function App() {
   const [error, setError] = useState<string | null>(null)
   const [reshuffleNonce, setReshuffleNonce] = useState(0)
   const [lastOpenedPack, setLastOpenedPack] = useState<OpenedPack | null>(null)
+  const [candidatePacks, setCandidatePacks] = useState<OpenedPack[] | null>(null)
   const [collection, setCollection] = useState<Collection>(loadCollection)
   const [view, setView] = useState<View>('home')
   const [selectedSetCode, setSelectedSetCode] = useState(AVAILABLE_SETS[0].code)
@@ -87,17 +92,32 @@ function App() {
   function selectSet(setCode: string) {
     setSelectedSetCode(setCode)
     setLastOpenedPack(null)
+    setCandidatePacks(null)
   }
 
   function reshufflePreview() {
     setReshuffleNonce((n) => n + 1)
   }
 
-  function openAndCollectPack() {
+  function startPackOpening() {
     if (!selectedPools) return
-    const pack = openPack(selectedPools.cards, selectedPools.tokens, selectedPools.lands)
+    setCandidatePacks(
+      Array.from({ length: PACK_CHOICE_COUNT }, () =>
+        openPack(selectedPools.cards, selectedPools.tokens, selectedPools.lands),
+      ),
+    )
+  }
+
+  function pickCandidate(index: number) {
+    if (!candidatePacks) return
+    const pack = candidatePacks[index]
     setLastOpenedPack(pack)
     setCollection((c) => addPackToCollection(c, selectedSetCode, pack))
+    setCandidatePacks(null)
+  }
+
+  function cancelPicking() {
+    setCandidatePacks(null)
   }
 
   if (isLoading) return <p className="status">Lade Karten…</p>
@@ -121,7 +141,10 @@ function App() {
             packOptions={packOptions}
             selectedSetCode={selectedSetCode}
             onSelectSet={selectSet}
-            onOpenPack={openAndCollectPack}
+            candidatePacks={candidatePacks}
+            onStartOpening={startPackOpening}
+            onPickCandidate={pickCandidate}
+            onCancelPicking={cancelPicking}
             lastOpenedPack={lastOpenedPack}
             previewPacks={previewPacks}
             onReshufflePreview={reshufflePreview}

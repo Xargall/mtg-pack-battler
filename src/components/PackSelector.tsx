@@ -8,11 +8,12 @@ interface PackSelectorProps {
   options: PackOption[]
   selectedSetCode: string
   onSelect: (setCode: string) => void
+  disabled?: boolean
 }
 
-export function PackSelector({ options, selectedSetCode, onSelect }: PackSelectorProps) {
+export function PackSelector({ options, selectedSetCode, onSelect, disabled = false }: PackSelectorProps) {
   return (
-    <div className="pack-selector">
+    <div className={`pack-selector${disabled ? ' pack-selector--disabled' : ''}`}>
       {options.map((option) => {
         const isSelected = option.setCode === selectedSetCode
         return (
@@ -22,6 +23,7 @@ export function PackSelector({ options, selectedSetCode, onSelect }: PackSelecto
             className={`pack-tile${isSelected ? ' pack-tile--selected' : ''}`}
             onClick={() => onSelect(option.setCode)}
             aria-pressed={isSelected}
+            disabled={disabled}
           >
             {option.artUrl && <img className="pack-tile__art" src={option.artUrl} alt="" />}
             <div className="pack-tile__frame">

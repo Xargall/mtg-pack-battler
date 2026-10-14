@@ -1,4 +1,5 @@
 import type { OpenedPack } from '../game/pack'
+import { PackPicker } from './PackPicker'
 import { PackSelector, type PackOption } from './PackSelector'
 import { PackView } from './PackView'
 
@@ -6,7 +7,10 @@ interface HomeScreenProps {
   packOptions: PackOption[]
   selectedSetCode: string
   onSelectSet: (setCode: string) => void
-  onOpenPack: () => void
+  candidatePacks: OpenedPack[] | null
+  onStartOpening: () => void
+  onPickCandidate: (index: number) => void
+  onCancelPicking: () => void
   lastOpenedPack: OpenedPack | null
   previewPacks: OpenedPack[]
   onReshufflePreview: () => void
@@ -16,20 +20,34 @@ export function HomeScreen({
   packOptions,
   selectedSetCode,
   onSelectSet,
-  onOpenPack,
+  candidatePacks,
+  onStartOpening,
+  onPickCandidate,
+  onCancelPicking,
   lastOpenedPack,
   previewPacks,
   onReshufflePreview,
 }: HomeScreenProps) {
+  const isPicking = candidatePacks !== null
+
   return (
     <div className="home">
-      <PackSelector options={packOptions} selectedSetCode={selectedSetCode} onSelect={onSelectSet} />
+      <PackSelector
+        options={packOptions}
+        selectedSetCode={selectedSetCode}
+        onSelect={onSelectSet}
+        disabled={isPicking}
+      />
 
-      <button type="button" className="open-pack-cta" onClick={onOpenPack}>
-        Pack öffnen
-      </button>
+      {isPicking ? (
+        <PackPicker count={candidatePacks.length} onPick={onPickCandidate} onCancel={onCancelPicking} />
+      ) : (
+        <button type="button" className="open-pack-cta" onClick={onStartOpening}>
+          Pack öffnen
+        </button>
+      )}
 
-      {lastOpenedPack && (
+      {lastOpenedPack && !isPicking && (
         <section className="reveal">
           <h3>Zuletzt geöffnet</h3>
           <PackView pack={lastOpenedPack} />
