@@ -83,43 +83,133 @@
   line-height: 1;
 }
 
+/* Bühne für Pack-Auswahl/-Picker: gedämpfter Goldschein im Hintergrund,
+   angelehnt an den Studio-Verlauf hinterm Pack in Pokémon TCG Pocket. */
+
+.pack-stage {
+  position: relative;
+  padding-top: 8px;
+}
+
+.pack-stage::before {
+  content: '';
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  width: 320px;
+  height: 260px;
+  transform: translateX(-50%);
+  background: radial-gradient(ellipse at center, rgba(212, 175, 55, 0.16), transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.pack-stage > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Schwebendes Pill-Label mit Verlaufsrand, wie Pokémon TCG Pockets
+   Sprechblase ("Please choose the booster pack you want"). */
+
+.pill-badge {
+  display: block;
+  width: fit-content;
+  margin: 0 auto 20px;
+  padding: 10px 22px;
+  border-radius: 999px;
+  background:
+    linear-gradient(var(--bg-elevated), var(--bg-elevated)) padding-box,
+    linear-gradient(120deg, var(--gold-dim), var(--gold), var(--accent-bright)) border-box;
+  border: 1px solid transparent;
+  font-family: var(--heading);
+  font-size: 13px;
+  letter-spacing: 0.4px;
+  color: var(--text-h);
+  text-align: center;
+}
+
 /* Pack-Auswahl-Karussell auf dem Start-Screen */
 
 .pack-selector {
   display: flex;
-  gap: 14px;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
   overflow-x: auto;
-  padding: 4px 4px 14px;
+  padding: 10px 4px 18px;
   margin: 0 -4px 4px;
   scroll-snap-type: x mandatory;
 }
 
-.pack-tile {
+/* Folienbeutel-Silhouette: leicht getaperter Kopf mit Siegelnaht und
+   diagonalem Glanzstreifen, statt einer flachen Karte. Gilt sowohl für
+   die Auswahl-Kacheln als auch die verdeckten Picker-Packs. */
+
+.pack-tile,
+.pack-back {
   position: relative;
+  border-radius: 22px 22px 12px 12px;
+  overflow: hidden;
+}
+
+.pack-tile::before,
+.pack-back::before {
+  content: '';
+  position: absolute;
+  top: 16%;
+  left: 8%;
+  right: 8%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.55), transparent);
+  z-index: 2;
+}
+
+.pack-tile::after,
+.pack-back::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(112deg, transparent 38%, rgba(255, 255, 255, 0.14) 48%, transparent 58%);
+  pointer-events: none;
+  z-index: 3;
+}
+
+.pack-tile {
   display: block;
   flex: 0 0 auto;
   width: 160px;
   aspect-ratio: 3 / 4;
   border: 3px solid var(--gold-dim);
-  border-radius: 16px;
-  overflow: hidden;
   background: linear-gradient(160deg, #241a10, #0c0906);
   box-shadow:
     0 0 0 1px rgba(212, 175, 55, 0.15),
-    0 20px 40px -12px rgba(0, 0, 0, 0.7);
+    0 24px 36px -16px rgba(0, 0, 0, 0.75);
   padding: 0;
-  scroll-snap-align: start;
+  scroll-snap-align: center;
+  transform: scale(0.9);
+  opacity: 0.75;
+  transition:
+    transform 0.15s ease,
+    opacity 0.15s ease;
 }
 
 .pack-tile:active {
-  transform: scale(0.98);
+  transform: scale(0.88);
 }
 
 .pack-tile--selected {
   border-color: var(--gold);
   box-shadow:
     0 0 0 1px rgba(212, 175, 55, 0.5),
-    0 0 24px 2px rgba(212, 175, 55, 0.45);
+    0 0 28px 4px rgba(212, 175, 55, 0.4),
+    0 24px 36px -16px rgba(0, 0, 0, 0.75);
+  transform: scale(1);
+  opacity: 1;
+}
+
+.pack-tile--selected:active {
+  transform: scale(0.98);
 }
 
 .pack-tile__art {
@@ -165,6 +255,7 @@
   justify-content: center;
   font-size: 13px;
   font-weight: bold;
+  z-index: 4;
 }
 
 .open-pack-cta {
@@ -198,18 +289,10 @@
   text-align: center;
 }
 
-.pack-picker__hint {
-  font-family: var(--heading);
-  font-size: 13px;
-  letter-spacing: 0.5px;
-  color: var(--text-dim);
-  margin-bottom: 14px;
-}
-
 .pack-picker__grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
+  gap: 12px;
   max-width: 320px;
   margin: 0 auto;
 }
@@ -217,12 +300,12 @@
 .pack-back {
   aspect-ratio: 3 / 4;
   border: 2px solid var(--gold-dim);
-  border-radius: 10px;
   background: linear-gradient(160deg, #241a10, #0c0906);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0;
+  box-shadow: 0 10px 18px -10px rgba(0, 0, 0, 0.7);
 }
 
 .pack-back:active {
@@ -231,6 +314,8 @@
 }
 
 .pack-back__ornament {
+  position: relative;
+  z-index: 1;
   color: var(--gold-dim);
   font-size: 20px;
 }

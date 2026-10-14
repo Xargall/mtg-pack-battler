@@ -32,20 +32,24 @@ export function HomeScreen({
 
   return (
     <div className="home">
-      <PackSelector
-        options={packOptions}
-        selectedSetCode={selectedSetCode}
-        onSelect={onSelectSet}
-        disabled={isPicking}
-      />
+      <div className="pack-stage">
+        {!isPicking && <p className="pill-badge">Wähle dein Pack</p>}
 
-      {isPicking ? (
-        <PackPicker count={candidatePacks.length} onPick={onPickCandidate} onCancel={onCancelPicking} />
-      ) : (
-        <button type="button" className="open-pack-cta" onClick={onStartOpening}>
-          Pack öffnen
-        </button>
-      )}
+        <PackSelector
+          options={packOptions}
+          selectedSetCode={selectedSetCode}
+          onSelect={onSelectSet}
+          disabled={isPicking}
+        />
+
+        {isPicking ? (
+          <PackPicker count={candidatePacks.length} onPick={onPickCandidate} onCancel={onCancelPicking} />
+        ) : (
+          <button type="button" className="open-pack-cta" onClick={onStartOpening}>
+            Pack öffnen
+          </button>
+        )}
+      </div>
 
       {lastOpenedPack && !isPicking && (
         <section className="reveal">

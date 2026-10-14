@@ -13,7 +13,7 @@ interface PackPickerProps {
 export function PackPicker({ count, onPick, onCancel }: PackPickerProps) {
   return (
     <div className="pack-picker">
-      <p className="pack-picker__hint">Wähle eins der verdeckten Packs</p>
+      <p className="pill-badge">Wähle eins der verdeckten Packs</p>
       <div className="pack-picker__grid">
         {Array.from({ length: count }, (_, i) => (
           <button key={i} type="button" className="pack-back" onClick={() => onPick(i)}>
