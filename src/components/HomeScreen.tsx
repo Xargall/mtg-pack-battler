@@ -1,10 +1,11 @@
 import type { OpenedPack } from '../game/pack'
-import type { Card } from '../types/card'
+import { PackSelector, type PackOption } from './PackSelector'
 import { PackView } from './PackView'
 
 interface HomeScreenProps {
-  setName: string
-  showcaseCard: Card | null
+  packOptions: PackOption[]
+  selectedSetCode: string
+  onSelectSet: (setCode: string) => void
   onOpenPack: () => void
   lastOpenedPack: OpenedPack | null
   previewPacks: OpenedPack[]
@@ -12,8 +13,9 @@ interface HomeScreenProps {
 }
 
 export function HomeScreen({
-  setName,
-  showcaseCard,
+  packOptions,
+  selectedSetCode,
+  onSelectSet,
   onOpenPack,
   lastOpenedPack,
   previewPacks,
@@ -21,14 +23,10 @@ export function HomeScreen({
 }: HomeScreenProps) {
   return (
     <div className="home">
-      <button type="button" className="pack-tile" onClick={onOpenPack}>
-        {showcaseCard?.artCropUrl && (
-          <img className="pack-tile__art" src={showcaseCard.artCropUrl} alt="" />
-        )}
-        <div className="pack-tile__frame">
-          <span className="pack-tile__set">{setName}</span>
-          <span className="pack-tile__cta">Pack öffnen</span>
-        </div>
+      <PackSelector options={packOptions} selectedSetCode={selectedSetCode} onSelect={onSelectSet} />
+
+      <button type="button" className="open-pack-cta" onClick={onOpenPack}>
+        Pack öffnen
       </button>
 
       {lastOpenedPack && (

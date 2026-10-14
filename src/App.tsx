@@ -3,15 +3,14 @@ import { fetchBasicLands, fetchCardsBySet, fetchTokensBySet } from './api/scryfa
 import { BottomNav, type View } from './components/BottomNav'
 import { CollectionView } from './components/CollectionView'
 import { HomeScreen } from './components/HomeScreen'
+import type { PackOption } from './components/PackSelector'
 import { openPack, type OpenedPack } from './game/pack'
+import { AVAILABLE_SETS } from './game/sets'
 import { addPackToCollection, countDistinctCards, countOwnedCards, loadCollection, saveCollection } from './storage/collection'
 import type { Card } from './types/card'
 import type { Collection } from './types/collection'
 import './App.css'
 
-const SET_CODE = 'blb' // Bloomburrow
-const SET_NAME = 'Bloomburrow'
-const TOKEN_SET_CODE = 'tblb' // Bloomburrow-Tokens
 const PREVIEW_PACK_COUNT = 4
 
 interface Pools {
@@ -20,27 +19,39 @@ interface Pools {
   lands: Card[]
 }
 
+// Zugkarte fürs Pack-Tile: nimmt die beste verfügbare Rarity aus dem
+// Set-Pool, damit die Kachel nicht mit einem Common wirbt.
+function showcaseCardFor(pools: Pools | undefined): Card | null {
+  if (!pools) return null
+  return (
+    pools.cards.find((c) => c.rarity === 'mythic') ??
+    pools.cards.find((c) => c.rarity === 'rare') ??
+    pools.cards[0] ??
+    null
+  )
+}
+
 function App() {
-  const [pools, setPools] = useState<Pools | null>(null)
+  const [poolsBySet, setPoolsBySet] = useState<Record<string, Pools>>({})
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [previewPacks, setPreviewPacks] = useState<OpenedPack[]>([])
+  const [reshuffleNonce, setReshuffleNonce] = useState(0)
   const [lastOpenedPack, setLastOpenedPack] = useState<OpenedPack | null>(null)
   const [collection, setCollection] = useState<Collection>(loadCollection)
   const [view, setView] = useState<View>('home')
+  const [selectedSetCode, setSelectedSetCode] = useState(AVAILABLE_SETS[0].code)
 
   useEffect(() => {
-    Promise.all([
-      fetchCardsBySet(SET_CODE),
-      fetchTokensBySet(TOKEN_SET_CODE),
-      fetchBasicLands(SET_CODE),
-    ])
-      .then(([cards, tokens, lands]) => {
-        setPools({ cards, tokens, lands })
-        setPreviewPacks(
-          Array.from({ length: PREVIEW_PACK_COUNT }, () => openPack(cards, tokens, lands)),
-        )
-      })
+    Promise.all(
+      AVAILABLE_SETS.map((set) =>
+        Promise.all([
+          fetchCardsBySet(set.code),
+          fetchTokensBySet(set.tokenSetCode),
+          fetchBasicLands(set.code),
+        ]).then(([cards, tokens, lands]) => [set.code, { cards, tokens, lands }] as const),
+      ),
+    )
+      .then((entries) => setPoolsBySet(Object.fromEntries(entries)))
       .catch((err: Error) => setError(err.message))
       .finally(() => setIsLoading(false))
   }, [])
@@ -50,54 +61,66 @@ function App() {
     saveCollection(collection)
   }, [collection])
 
-  // Zugkarte fürs Pack-Tile auf dem Start-Screen: nimmt die beste verfügbare
-  // Rarity aus dem Set-Pool, damit die Kachel nicht mit einem Common wirbt.
-  const showcaseCard = useMemo(() => {
-    if (!pools) return null
-    return (
-      pools.cards.find((c) => c.rarity === 'mythic') ??
-      pools.cards.find((c) => c.rarity === 'rare') ??
-      pools.cards[0] ??
-      null
+  const selectedSet = AVAILABLE_SETS.find((s) => s.code === selectedSetCode) ?? AVAILABLE_SETS[0]
+  const selectedPools = poolsBySet[selectedSetCode]
+
+  // Vorschau-Packs: neu gezogen, sobald die Pools des gewählten Sets
+  // verfügbar sind, sich die Auswahl ändert, oder "Neu mischen" greift.
+  const previewPacks = useMemo(() => {
+    if (!selectedPools) return []
+    return Array.from({ length: PREVIEW_PACK_COUNT }, () =>
+      openPack(selectedPools.cards, selectedPools.tokens, selectedPools.lands),
     )
-  }, [pools])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- reshuffleNonce ist nur ein Trigger
+  }, [selectedPools, reshuffleNonce])
+
+  const packOptions: PackOption[] = useMemo(
+    () =>
+      AVAILABLE_SETS.map((set) => ({
+        setCode: set.code,
+        setName: set.name,
+        artUrl: showcaseCardFor(poolsBySet[set.code])?.artCropUrl ?? null,
+      })),
+    [poolsBySet],
+  )
+
+  function selectSet(setCode: string) {
+    setSelectedSetCode(setCode)
+    setLastOpenedPack(null)
+  }
 
   function reshufflePreview() {
-    if (!pools) return
-    setPreviewPacks(
-      Array.from({ length: PREVIEW_PACK_COUNT }, () =>
-        openPack(pools.cards, pools.tokens, pools.lands),
-      ),
-    )
+    setReshuffleNonce((n) => n + 1)
   }
 
   function openAndCollectPack() {
-    if (!pools) return
-    const pack = openPack(pools.cards, pools.tokens, pools.lands)
+    if (!selectedPools) return
+    const pack = openPack(selectedPools.cards, selectedPools.tokens, selectedPools.lands)
     setLastOpenedPack(pack)
-    setCollection((c) => addPackToCollection(c, SET_CODE, pack))
+    setCollection((c) => addPackToCollection(c, selectedSetCode, pack))
   }
 
   if (isLoading) return <p className="status">Lade Karten…</p>
   if (error) return <p className="status">Fehler: {error}</p>
-  if (!pools) return null
+  if (!selectedPools) return null
 
-  const totalPrints = pools.cards.length + pools.tokens.length + pools.lands.length
+  const totalPrints = selectedPools.cards.length + selectedPools.tokens.length + selectedPools.lands.length
 
   return (
     <>
       <header className="top-bar">
         <h1>MTG Pack Battler</h1>
         <span className="top-bar__stat">
-          {countDistinctCards(collection, SET_CODE)}/{totalPrints}
+          {countDistinctCards(collection, selectedSetCode)}/{totalPrints}
         </span>
       </header>
 
       <main className="app-main">
         {view === 'home' ? (
           <HomeScreen
-            setName={SET_NAME}
-            showcaseCard={showcaseCard}
+            packOptions={packOptions}
+            selectedSetCode={selectedSetCode}
+            onSelectSet={selectSet}
             onOpenPack={openAndCollectPack}
             lastOpenedPack={lastOpenedPack}
             previewPacks={previewPacks}
@@ -105,15 +128,15 @@ function App() {
           />
         ) : (
           <section>
-            <h2>Sammlung — {SET_NAME}</h2>
+            <h2>Sammlung — {selectedSet.name}</h2>
             <p className="collection-summary">
-              {countOwnedCards(collection, SET_CODE)} Karten insgesamt
+              {countOwnedCards(collection, selectedSetCode)} Karten insgesamt
             </p>
             <CollectionView
-              cards={pools.cards}
-              tokens={pools.tokens}
-              lands={pools.lands}
-              setCollection={collection[SET_CODE]}
+              cards={selectedPools.cards}
+              tokens={selectedPools.tokens}
+              lands={selectedPools.lands}
+              setCollection={collection[selectedSetCode]}
             />
           </section>
         )}

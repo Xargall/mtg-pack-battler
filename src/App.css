@@ -83,27 +83,43 @@
   line-height: 1;
 }
 
-/* Pack-Tile auf dem Start-Screen */
+/* Pack-Auswahl-Karussell auf dem Start-Screen */
+
+.pack-selector {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  padding: 4px 4px 14px;
+  margin: 0 -4px 4px;
+  scroll-snap-type: x mandatory;
+}
 
 .pack-tile {
   position: relative;
   display: block;
-  width: 100%;
-  max-width: 260px;
+  flex: 0 0 auto;
+  width: 160px;
   aspect-ratio: 3 / 4;
-  margin: 4px auto 28px;
-  border: 3px solid var(--gold);
+  border: 3px solid var(--gold-dim);
   border-radius: 16px;
   overflow: hidden;
   background: linear-gradient(160deg, #241a10, #0c0906);
   box-shadow:
-    0 0 0 1px rgba(212, 175, 55, 0.3),
+    0 0 0 1px rgba(212, 175, 55, 0.15),
     0 20px 40px -12px rgba(0, 0, 0, 0.7);
   padding: 0;
+  scroll-snap-align: start;
 }
 
 .pack-tile:active {
   transform: scale(0.98);
+}
+
+.pack-tile--selected {
+  border-color: var(--gold);
+  box-shadow:
+    0 0 0 1px rgba(212, 175, 55, 0.5),
+    0 0 24px 2px rgba(212, 175, 55, 0.45);
 }
 
 .pack-tile__art {
@@ -122,29 +138,52 @@
   flex-direction: column;
   align-items: center;
   justify-content: flex-end;
-  padding: 18px;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.88) 15%, rgba(0, 0, 0, 0) 60%);
+  padding: 14px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.88) 20%, rgba(0, 0, 0, 0) 65%);
   text-align: center;
 }
 
 .pack-tile__set {
   font-family: var(--heading);
-  font-size: 21px;
+  font-size: 16px;
   color: var(--text-h);
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
   text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
 }
 
-.pack-tile__cta {
-  margin-top: 10px;
+.pack-tile__badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--gold);
+  color: #120d09;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.open-pack-cta {
+  display: block;
+  margin: 4px auto 28px;
   font-family: var(--heading);
-  font-size: 12px;
+  font-size: 13px;
   letter-spacing: 1.5px;
   text-transform: uppercase;
   color: #120d09;
   background: var(--gold);
-  padding: 8px 20px;
+  border: none;
+  padding: 12px 36px;
   border-radius: 999px;
+  box-shadow: 0 10px 20px -8px rgba(212, 175, 55, 0.6);
+}
+
+.open-pack-cta:active {
+  transform: scale(0.98);
 }
 
 .reveal {
