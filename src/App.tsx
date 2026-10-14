@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { fetchBasicLands, fetchCardsBySet, fetchTokensBySet } from './api/scryfall'
+import { CollectionView } from './components/CollectionView'
 import { openPack, type OpenedPack } from './game/pack'
 import { addPackToCollection, countDistinctCards, countOwnedCards, loadCollection, saveCollection } from './storage/collection'
 import type { Card } from './types/card'
@@ -16,6 +17,8 @@ interface Pools {
   lands: Card[]
 }
 
+type View = 'open' | 'collection'
+
 function App() {
   const [pools, setPools] = useState<Pools | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -23,6 +26,7 @@ function App() {
   const [previewPacks, setPreviewPacks] = useState<OpenedPack[]>([])
   const [lastOpenedPack, setLastOpenedPack] = useState<OpenedPack | null>(null)
   const [collection, setCollection] = useState<Collection>(loadCollection)
+  const [view, setView] = useState<View>('open')
 
   useEffect(() => {
     Promise.all([
@@ -65,43 +69,67 @@ function App() {
   if (error) return <p>Fehler: {error}</p>
   if (!pools) return null
 
-  const totalPrints = pools.cards.length + pools.tokens.length
+  const totalPrints = pools.cards.length + pools.tokens.length + pools.lands.length
 
   return (
     <>
-      <section>
-        <h2>Sammlung — Bloomburrow</h2>
-        <p>
-          {countDistinctCards(collection, SET_CODE)} / {totalPrints} verschiedene Karten,{' '}
-          {countOwnedCards(collection, SET_CODE)} Karten insgesamt
-        </p>
-        <button type="button" onClick={openAndCollectPack}>
-          Pack öffnen
+      <nav className="view-switch">
+        <button type="button" disabled={view === 'open'} onClick={() => setView('open')}>
+          Packs öffnen
         </button>
-
-        {lastOpenedPack && (
-          <>
-            <h3>Zuletzt geöffnet</h3>
-            <PackView pack={lastOpenedPack} />
-          </>
-        )}
-      </section>
-
-      <hr />
-
-      <section>
-        <h2>Vorschau (Testerei — ändert die Sammlung nicht)</h2>
-        <button type="button" onClick={reshufflePreview}>
-          Neu mischen
+        <button type="button" disabled={view === 'collection'} onClick={() => setView('collection')}>
+          Sammlung
         </button>
+      </nav>
 
-        {previewPacks.map((pack, i) => (
-          <div key={i}>
-            <h3>Pack {i + 1}</h3>
-            <PackView pack={pack} />
-          </div>
-        ))}
-      </section>
+      <p>
+        {countDistinctCards(collection, SET_CODE)} / {totalPrints} verschiedene Karten,{' '}
+        {countOwnedCards(collection, SET_CODE)} Karten insgesamt
+      </p>
+
+      {view === 'open' ? (
+        <>
+          <section>
+            <h2>Bloomburrow</h2>
+            <button type="button" onClick={openAndCollectPack}>
+              Pack öffnen
+            </button>
+
+            {lastOpenedPack && (
+              <>
+                <h3>Zuletzt geöffnet</h3>
+                <PackView pack={lastOpenedPack} />
+              </>
+            )}
+          </section>
+
+          <hr />
+
+          <section>
+            <h2>Vorschau (Testerei — ändert die Sammlung nicht)</h2>
+            <button type="button" onClick={reshufflePreview}>
+              Neu mischen
+            </button>
+
+            {previewPacks.map((pack, i) => (
+              <div key={i}>
+                <h3>Pack {i + 1}</h3>
+                <PackView pack={pack} />
+              </div>
+            ))}
+          </section>
+        </>
+      ) : (
+        <section>
+          <h2>Sammlung — Bloomburrow</h2>
+          <CollectionView
+            cards={pools.cards}
+            tokens={pools.tokens}
+            lands={pools.lands}
+            setCollection={collection[SET_CODE]}
+          />
+        </section>
+      )}
     </>
   )
 }

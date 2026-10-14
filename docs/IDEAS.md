@@ -83,6 +83,11 @@ dauerhaft in die Sammlung.
 - KI-Logik für "Kai": Deckbau-Heuristik und Rundenwahl-Strategie
 - Wie das Pack-Einsatz-Risiko im UI kommuniziert wird, damit klar ist, dass
   das Pack riskiert wird
+- Pack-Öffnen-Cooldown: Packs sollen nicht beliebig oft direkt
+  hintereinander geöffnet werden können, sondern erst nach einer gewissen
+  Zeit wieder verfügbar sein — ähnlich dem Pack-System von Pokémon TCG
+  Pocket. Soll das Sammeln bewusst entschleunigen (siehe auch:
+  Duplikate innerhalb eines Packs sind gewollt, aus demselben Grund)
 
 ## Tech-Entscheidungen (bewusst getroffen, bitte nicht in Frage stellen)
 
