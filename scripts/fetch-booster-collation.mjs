@@ -17,7 +17,7 @@ const SEALED_DATA_URL = 'https://raw.githubusercontent.com/taw/magic-sealed-data
 
 // Muss manuell mit src/game/sets.ts synchron gehalten werden — dieses
 // Skript läuft außerhalb der Vite/TS-Pipeline, daher kein Import von dort.
-const SET_CODES = ['blb']
+const SET_CODES = ['blb', 'dsk']
 
 const outDir = new URL('../src/game/data/collation/', import.meta.url)
 
